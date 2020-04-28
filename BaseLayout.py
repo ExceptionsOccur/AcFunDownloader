@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -9,7 +10,7 @@ class BaseUI(object):
         _translate = QtCore.QCoreApplication.translate
 
         MWin.setObjectName('GUI_MWin')
-        MWin.setFixedSize(400, 120)
+        MWin.setFixedSize(400, 150)
         # MWin.resize(400, 120)
         # MWin.setMinimumSize(QtCore.QSize(400, 120))
         # MWin.setMaximumSize(QtCore.QSize(600, 120))
@@ -24,7 +25,7 @@ class BaseUI(object):
 
         self.central_widget = QtWidgets.QWidget(MWin)   # create based parent widget
         self.central_widget.setObjectName('central_widget')
-        self.central_widget.resize(400, 120)
+        self.central_widget.resize(400, 150)
 
         self.vertical_layout = QtWidgets.QVBoxLayout(self.central_widget)
         self.vertical_layout.setContentsMargins(10, 10, 10, 10)
@@ -43,7 +44,7 @@ class BaseUI(object):
         font.setFamily('微软雅黑')
         font.setPointSize(10)
         self.input_box.setFont(font)
-        self.input_box.setPlaceholderText(_translate('GUI_MWin', '输入视频链接'))
+        self.input_box.setPlaceholderText(_translate('GUI_MWin', '输入ac号或视频链接'))
         self.input_box.setObjectName('input_box')
         self.up_layout.addWidget(self.input_box)
 
@@ -67,6 +68,32 @@ class BaseUI(object):
         self.download_btn.setText(_translate('GUI_MWin', '下载'))
         self.up_layout.addWidget(self.download_btn)
         self.vertical_layout.addLayout(self.up_layout)
+
+
+
+
+        self.tips_layout = QtWidgets.QHBoxLayout()
+        self.tips_layout.setSpacing(10)
+        self.tips_layout.setObjectName('tips_layout')
+
+        self.download_bar = QtWidgets.QProgressBar(self.central_widget)
+        self.download_bar.setMinimum(0)
+        self.download_bar.setMaximum(100)
+        self.download_bar.setOrientation(QtCore.Qt.Horizontal)
+        self.download_bar.setObjectName('download_bar')
+        self.tips_layout.addWidget(self.download_bar)
+
+        self.fold_btn = QtWidgets.QPushButton(self.central_widget)
+        font = QtGui.QFont()
+        font.setFamily('微软雅黑')
+        font.setPointSize(10)
+        self.fold_btn.setFont(font)
+        self.fold_btn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.fold_btn.setObjectName('fold_btn')
+        self.fold_btn.setText(_translate('GUI_MWin', os.getcwd()))
+        self.tips_layout.addWidget(self.fold_btn)
+
+        self.vertical_layout.addLayout(self.tips_layout)
 
         self.table_widget = QtWidgets.QTableWidget(self.central_widget)
         font = QtGui.QFont()
@@ -96,8 +123,8 @@ class BaseUI(object):
         self.up_layout.setStretchFactor(self.input_box, 8)
         self.up_layout.setStretchFactor(self.search_btn, 2)
         self.up_layout.setStretchFactor(self.download_btn, 2)
-        self.table_widget.setColumnWidth(0, 40)
-        self.table_widget.setColumnWidth(1, 338)
+        self.table_widget.setColumnWidth(0, 60)
+        self.table_widget.setColumnWidth(1, 318)
         # self.table_widget.setItem(0, 0, QtWidgets.QTableWidgetItem('标题').setTextAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter))
         # self.table_widget.setItem(1, 0, QtWidgets.QTableWidgetItem('up主').setTextAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter))
         self.table_widget.setItem(0, 0, QtWidgets.QTableWidgetItem('标题'))
