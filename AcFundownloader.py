@@ -5,6 +5,7 @@ import re
 import time
 import sys
 import requests
+import cv2
 from PyQt5.QtCore import QThread, pyqtSignal, QCoreApplication
 from PyQt5 import QtWidgets, QtCore, Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
@@ -17,6 +18,7 @@ global title
 global up
 global create_time
 global duration
+global path_for_download
 PAUSE = 0
 CANCEL = -1
 START = 1
@@ -27,6 +29,16 @@ m3u8_section = r'window.videoInfo = (.*?);\n        window.qualityConfig ='
 headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) \
                             Chrome/80.0.3987.132 Safari/537.36 Edg/80.0.361.66'}
 
+
+def get_mp4_duration(file_name):
+    cap = cv2.VideoCapture(file_name)
+    if cap.isOpened():
+        rate = cap.get(5)
+        frame_num = cap.get(7)
+        duration_time = frame_num / rate
+        [m, s] = divmod(duration_time, 60)
+        return '{:0>2d}:{:0>2d}'.format(int(m), int(s))
+    return -1
 
 class GetInfoThread(QThread):
 
@@ -51,7 +63,6 @@ class GetInfoThread(QThread):
         if input_data is '':
             self.no_this_ac.emit('输入为空')
             return
-        pause_point = 0
         PAUSE = False
         ac_num = ''
         temp = re.findall(r'(ac\d+)', input_data)
@@ -97,20 +108,22 @@ class DownloadThread(QThread):
     signal = pyqtSignal(int)
     pause_point = pyqtSignal(int)
     file_exits = pyqtSignal(str)
+    file_error = pyqtSignal(str)
 
     def __init__(self):
         super(DownloadThread, self).__init__()
 
     def run(self):
-        global path
+        global path_for_download
+        global duration
         input_title = re.sub(illegal_name, '-', self.data[0])
         start_point = self.data[2]
         total_num = len(ts_url)
         file_name = input_title + '.mp4'
-        if os.path.exists(path + '/' + file_name) is True:
+        if os.path.exists(path_for_download + '/' + file_name) is True:
             self.file_exits.emit('该文件已存在')
             return
-        with open(path + '/' + file_name, 'ab') as f:
+        with open(path_for_download + '/' + file_name, 'ab') as f:
             for i in range(start_point, total_num):
                 ts = requests.get(ts_pref_url + ts_url[i])
                 f.write(ts.content)
@@ -125,11 +138,14 @@ class DownloadThread(QThread):
                         return
                 if self.data[1] is CANCEL:
                     f.close()
-                    os.remove(path + '/' + file_name)
+                    os.remove(path_for_download + '/' + file_name)
                     self.signal.emit(0)
                     return
             f.close()
         self.signal.emit(100)
+        local_file_duration = get_mp4_duration(path_for_download + '/' + file_name)
+        if local_file_duration is not duration:
+            self.file_error.emit('文件错误，下载文件时长不符！')
         # for i in range(0, total_num):
         #     ts = requests.get(ts_pref_url + ts_url[i])
         #     # with open(str.split(url_info, '?')[0], 'wb') as code:
@@ -147,6 +163,7 @@ class AcFunDownloader(QMainWindow, BaseUI):
         self.setUI(self)
         with open('./Style.qss', 'r') as f:
             self.setStyleSheet(f.read())
+        global path_for_download
         self.flag = True
         self.position = self.pos()
         self.title = ''
@@ -158,6 +175,7 @@ class AcFunDownloader(QMainWindow, BaseUI):
         self.download_thread = DownloadThread()
         self.setMouseTracking(True)
         self.path = os.getcwd()
+        path_for_download = self.path
         self.search_btn.clicked.connect(self.get_info_and_show)
         self.download_btn.clicked.connect(self.download_video)
         self.fold_btn.clicked.connect(self.get_directory)
@@ -188,7 +206,7 @@ class AcFunDownloader(QMainWindow, BaseUI):
             self.download_bar.setValue(0)
             self.download_btn.setText('下载')
         else:
-            os.remove(path + '/' + self.title + '.mp4')
+            os.remove(self.path + '/' + self.title + '.mp4')
             self.download_bar.setValue(0)
             self.download_btn.setText('下载')
         self.pause_btn.disconnect()
@@ -199,9 +217,12 @@ class AcFunDownloader(QMainWindow, BaseUI):
         self.download_thread.start()
 
     def get_directory(self):
+        global path_for_download
         self.path = QFileDialog.getExistingDirectory(None, "选择保存文件夹", os.getcwd())
+        path_for_download = self.path
         if len(self.path) is 0:
             self.path = os.getcwd()
+            path_for_download = self.path
         if len(self.path) > 20:
             show_dir = self.path.split('/')[-1]
             show_path = self.path[0:3] + '../' + show_dir
