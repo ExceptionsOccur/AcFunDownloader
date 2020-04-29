@@ -1,6 +1,8 @@
 # AcFunDownloader
 AcFun - 认真你就输啦 (・ω・)ノ- ( ゜- ゜)つロ
 
+<iframe height=500 width=500 src="demo.gif">demo</iframe>  
+
 
 ## TO DO：
 1、添加异常判断，包括：~~网络错误异常~~、~~网络返回数据异常~~、下载文件校验、~~输入链接判断~~   
