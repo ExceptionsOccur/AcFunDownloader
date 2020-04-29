@@ -25,14 +25,23 @@ class BaseUI(object):
         font.setFamily('微软雅黑')
         font.setPointSize(10)
         MWin.setFont(font)
-        MWin.setWindowTitle(_translate('MWin', '我真的输了'))
-        # icon = QtGui.QIcon()
-        # icon.addPixmap(QtGui.QPixmap('02.png'), QtGui.QIcon.Normal)     # TO DO：图标换个识别度好的
-        # MWin.setWindowIcon(icon)
+        MWin.setWindowTitle(_translate('MWin', 'AcFunDownloader'))
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap('icon.ico'), QtGui.QIcon.Normal)     # TO DO：图标换个识别度好的
+        MWin.setWindowIcon(icon)
 
         self.central_widget = QtWidgets.QWidget(MWin)   # create based parent widget
         self.central_widget.setObjectName('central_widget')
         self.central_widget.resize(420, 260)
+
+        self.text_box = QtWidgets.QLabel(self.central_widget)
+        self.text_box.setFixedSize(400, 15)
+        font = QtGui.QFont()
+        font.setFamily('微软雅黑')
+        font.setPointSize(8)
+        self.text_box.setFont(font)
+        self.text_box.setText(_translate('MWin', 'AcFun - 认真你就输啦 (・ω・)ノ- ( ゜- ゜)つロ'))
+        self.text_box.setAlignment(QtCore.Qt.AlignCenter)
 
         self.vertical_layout = QtWidgets.QVBoxLayout(self.central_widget)
         self.vertical_layout.setContentsMargins(10, 10, 10, 10)
