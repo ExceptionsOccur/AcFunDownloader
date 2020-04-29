@@ -101,7 +101,7 @@ class DownloadThread(QThread):
 
     def run(self):
         global path
-        input_title = self.data[0]
+        input_title = re.sub(illegal_name, '-', self.data[0])
         start_point = self.data[2]
         total_num = len(ts_url)
         file_name = input_title + '.mp4'
@@ -250,7 +250,7 @@ class AcFunDownloader(QMainWindow, BaseUI):
                 return
             data = temp[0]
             data_json = json.loads(data)
-            self.title = data_json['title']
+            self.title = re.sub(illegal_name, '-', data_json['title'])
             self.up = data_json['user']['name']
             self.create_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(data_json['videoList'][0]['uploadTime'] / 1000))
             [m, s] = divmod(data_json['videoList'][0]['durationMillis'] / 1000, 60)

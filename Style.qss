@@ -27,11 +27,6 @@
     background:red;
 }
 
-.QWidget#central_widget{
-
-    border-radius:5px;
-}
-
 QLineEdit,QMessageBox::pane{
     color:#00466B;
     border-radius:5px;
