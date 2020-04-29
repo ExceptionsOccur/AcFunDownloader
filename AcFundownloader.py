@@ -7,21 +7,21 @@ import sys
 import requests
 import cv2
 from PyQt5.QtCore import QThread, pyqtSignal, QCoreApplication
-from PyQt5 import QtWidgets, QtCore, Qt
+from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from BaseLayout import BaseUI
 
 ts_url = []
 ts_pref_url = ''
+path = ''
 last_ac = ''
+PAUSE = 0
+CANCEL = -1
+START = 1
 global title
 global up
 global create_time
 global duration
-global path_for_download
-PAUSE = 0
-CANCEL = -1
-START = 1
 ts_url_section = r',\n(.*?)\n#'
 ts_pref_url_section = r'https(.*?)segment/'
 illegal_name = r'[\/\\\:\*\?\"\<\>\|\s\n]'
@@ -39,6 +39,7 @@ def get_mp4_duration(file_name):
         [m, s] = divmod(duration_time, 60)
         return '{:0>2d}:{:0>2d}'.format(int(m), int(s))
     return -1
+
 
 class GetInfoThread(QThread):
 
@@ -114,16 +115,17 @@ class DownloadThread(QThread):
         super(DownloadThread, self).__init__()
 
     def run(self):
-        global path_for_download
+        global path
         global duration
+        global START
         input_title = re.sub(illegal_name, '-', self.data[0])
         start_point = self.data[2]
         total_num = len(ts_url)
         file_name = input_title + '.mp4'
-        if os.path.exists(path_for_download + '/' + file_name) is True:
+        if os.path.exists(path + '/' + file_name) is True:
             self.file_exits.emit('该文件已存在')
             return
-        with open(path_for_download + '/' + file_name, 'ab') as f:
+        with open(path + '/' + file_name, 'ab') as f:
             for i in range(start_point, total_num):
                 ts = requests.get(ts_pref_url + ts_url[i])
                 f.write(ts.content)
@@ -138,13 +140,14 @@ class DownloadThread(QThread):
                         return
                 if self.data[1] is CANCEL:
                     f.close()
-                    os.remove(path_for_download + '/' + file_name)
+                    os.remove(path + '/' + file_name)
                     self.signal.emit(0)
                     return
             f.close()
+            START = 0
         self.signal.emit(100)
-        local_file_duration = get_mp4_duration(path_for_download + '/' + file_name)
-        if local_file_duration is not duration:
+        local_file_duration = get_mp4_duration(path + '/' + file_name)
+        if duration != local_file_duration:
             self.file_error.emit('文件错误，下载文件时长不符！')
         # for i in range(0, total_num):
         #     ts = requests.get(ts_pref_url + ts_url[i])
@@ -163,19 +166,14 @@ class AcFunDownloader(QMainWindow, BaseUI):
         self.setUI(self)
         with open('./Style.qss', 'r') as f:
             self.setStyleSheet(f.read())
-        global path_for_download
-        self.flag = True
-        self.position = self.pos()
+        global path
         self.title = ''
         self.up = ''
-        self.duration = ''
         self.create_time = ''
         self.pause_point = 0
         self.get_info_thread = GetInfoThread()
         self.download_thread = DownloadThread()
-        self.setMouseTracking(True)
-        self.path = os.getcwd()
-        path_for_download = self.path
+        path = os.getcwd()
         self.search_btn.clicked.connect(self.get_info_and_show)
         self.download_btn.clicked.connect(self.download_video)
         self.fold_btn.clicked.connect(self.get_directory)
@@ -189,6 +187,7 @@ class AcFunDownloader(QMainWindow, BaseUI):
         self.get_info_thread.no_this_ac.connect(self.pop_information)
         self.get_info_thread.ac_num_is_illegal.connect(self.pop_information)
         self.get_info_thread.same_result.connect(self.pop_information)
+        self.download_thread.file_error.connect(self.pop_information)
 
     def store_pause_point(self, i):
         self.pause_point = i
@@ -198,17 +197,17 @@ class AcFunDownloader(QMainWindow, BaseUI):
 
     def pause_task(self):
         self.download_thread.data[1] = PAUSE
-        self.download_btn.setText('开始')
+        self.download_btn.setText(QCoreApplication.translate('GUI_MWin', '开始'))
 
     def cancel_task(self):
         if self.download_thread.isRunning():
             self.download_thread.data[1] = CANCEL
             self.download_bar.setValue(0)
-            self.download_btn.setText('下载')
+            self.download_btn.setText(QCoreApplication.translate('GUI_MWin', '下载'))
         else:
-            os.remove(self.path + '/' + self.title + '.mp4')
+            os.remove(path + '/' + self.title + '.mp4')
             self.download_bar.setValue(0)
-            self.download_btn.setText('下载')
+            self.download_btn.setText(QCoreApplication.translate('GUI_MWin', '下载'))
         self.pause_btn.disconnect()
         self.cancel_btn.disconnect()
 
@@ -217,28 +216,25 @@ class AcFunDownloader(QMainWindow, BaseUI):
         self.download_thread.start()
 
     def get_directory(self):
-        global path_for_download
-        self.path = QFileDialog.getExistingDirectory(None, "选择保存文件夹", os.getcwd())
-        path_for_download = self.path
-        if len(self.path) is 0:
-            self.path = os.getcwd()
-            path_for_download = self.path
-        if len(self.path) > 20:
-            show_dir = self.path.split('/')[-1]
-            show_path = self.path[0:3] + '../' + show_dir
+        global path
+        path = QFileDialog.getExistingDirectory(None, "选择保存文件夹", os.getcwd())
+        if len(path) > 20:
+            show_dir = path.split('/')[-1]
+            show_path = path[0:3] + '../' + show_dir
         else:
-            show_path = self.path
-        self.fold_btn.setText(show_path)
+            show_path = path
+        self.fold_btn.setText(QCoreApplication.translate('GUI_MWin', show_path))
 
     def get_info_callback(self, callback_list):
+        global duration
         self.title = callback_list[0]
         self.up = callback_list[1]
         self.create_time = callback_list[2]
-        self.duration = callback_list[3]
+        duration = callback_list[3]
         self.table_widget.setItem(0, 1, QtWidgets.QTableWidgetItem(self.title))
         self.table_widget.setItem(1, 1, QtWidgets.QTableWidgetItem(self.up))
         self.table_widget.setItem(2, 1, QtWidgets.QTableWidgetItem(self.create_time))
-        self.table_widget.setItem(3, 1, QtWidgets.QTableWidgetItem(self.duration))
+        self.table_widget.setItem(3, 1, QtWidgets.QTableWidgetItem(duration))
 
     def update_ui(self, t, u, c, d):
         self.table_widget.setItem(0, 1, QtWidgets.QTableWidgetItem(t))
@@ -256,6 +252,7 @@ class AcFunDownloader(QMainWindow, BaseUI):
     def download_video(self):
         global ts_pref_url
         global ts_url
+        global duration
         if ts_pref_url is '':
             input_data = self.input_box.text()
             ac_num = ''
@@ -280,34 +277,18 @@ class AcFunDownloader(QMainWindow, BaseUI):
             self.up = data_json['user']['name']
             self.create_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(data_json['videoList'][0]['uploadTime'] / 1000))
             [m, s] = divmod(data_json['videoList'][0]['durationMillis'] / 1000, 60)
-            self.duration = '{:0>2d}:{:0>2d}'.format(int(m), int(s))
+            duration = '{:0>2d}:{:0>2d}'.format(int(m), int(s))
             ks_play_info = data_json['currentVideoInfo']['ksPlayJson']
             ks_play_json = json.loads(ks_play_info)
             m3u8_file_url = ks_play_json['adaptationSet']['representation'][0]['url']
             res = requests.get(m3u8_file_url).text
             ts_url = re.findall(ts_url_section, res)
             ts_pref_url = re.search(ts_pref_url_section, m3u8_file_url)[0]
-            self.update_ui(self.title, self.up, self.create_time, self.duration)
+            self.update_ui(self.title, self.up, self.create_time, duration)
         self.download_thread.data = [self.title, START, self.pause_point]
         self.download_thread.start()
         self.pause_btn.clicked.connect(self.pause_task)
         self.cancel_btn.clicked.connect(self.cancel_task)
-
-    def mousePressEvent(self, event):
-        if event.button() is Qt.Qt.LeftButton:
-            self.flag = True
-            self.position = event.globalPos() - self.pos()
-            event.accept()
-            self.setCursor(Qt.QCursor(Qt.Qt.OpenHandCursor))
-
-    def mouseMoveEvent(self, event):
-        if event.button() is Qt.Qt.LeftButton and self.flag:
-            self.move(event.globalPos() - self.position)
-            event.accept()
-
-    def mouseReleaseEvent(self, event):
-        self.flag = False
-        self.setCursor(Qt.QCursor(Qt.Qt.ArrowCursor))
 
 
 if __name__ == '__main__':
