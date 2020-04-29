@@ -40,7 +40,8 @@ class BaseUI(object):
         font.setFamily('微软雅黑')
         font.setPointSize(8)
         self.text_box.setFont(font)
-        self.text_box.setText(_translate('MWin', 'AcFun - 认真你就输啦 (・ω・)ノ- ( ゜- ゜)つロ'))
+        # self.text_box.setText(_translate('MWin', 'AcFun - 认真你就输啦 (・ω・)ノ- ( ゜- ゜)つロ'))
+        self.text_box.setText('AcFun - 认真你就输啦 (・ω・)ノ- ( ゜- ゜)つロ')
         self.text_box.setAlignment(QtCore.Qt.AlignCenter)
 
         self.vertical_layout = QtWidgets.QVBoxLayout(self.central_widget)

@@ -6,14 +6,17 @@ import time
 import sys
 import requests
 from PyQt5.QtCore import QThread, pyqtSignal, QCoreApplication
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore, Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from BaseLayout import BaseUI
 
 ts_url = []
 ts_pref_url = ''
-path = ''
 last_ac = ''
+global title
+global up
+global create_time
+global duration
 PAUSE = 0
 CANCEL = -1
 START = 1
@@ -43,7 +46,6 @@ class GetInfoThread(QThread):
         global up
         global create_time
         global duration
-        global pause_point
         global PAUSE
         input_data = self.data
         if input_data is '':
@@ -145,7 +147,8 @@ class AcFunDownloader(QMainWindow, BaseUI):
         self.setUI(self)
         with open('./Style.qss', 'r') as f:
             self.setStyleSheet(f.read())
-        global path
+        self.flag = True
+        self.position = self.pos()
         self.title = ''
         self.up = ''
         self.duration = ''
@@ -153,7 +156,8 @@ class AcFunDownloader(QMainWindow, BaseUI):
         self.pause_point = 0
         self.get_info_thread = GetInfoThread()
         self.download_thread = DownloadThread()
-        path = os.getcwd()
+        self.setMouseTracking(True)
+        self.path = os.getcwd()
         self.search_btn.clicked.connect(self.get_info_and_show)
         self.download_btn.clicked.connect(self.download_video)
         self.fold_btn.clicked.connect(self.get_directory)
@@ -176,17 +180,17 @@ class AcFunDownloader(QMainWindow, BaseUI):
 
     def pause_task(self):
         self.download_thread.data[1] = PAUSE
-        self.download_btn.setText(QCoreApplication.translate('GUI_MWin', '开始'))
+        self.download_btn.setText('开始')
 
     def cancel_task(self):
         if self.download_thread.isRunning():
             self.download_thread.data[1] = CANCEL
             self.download_bar.setValue(0)
-            self.download_btn.setText(QCoreApplication.translate('GUI_MWin', '下载'))
+            self.download_btn.setText('下载')
         else:
             os.remove(path + '/' + self.title + '.mp4')
             self.download_bar.setValue(0)
-            self.download_btn.setText(QCoreApplication.translate('GUI_MWin', '下载'))
+            self.download_btn.setText('下载')
         self.pause_btn.disconnect()
         self.cancel_btn.disconnect()
 
@@ -195,14 +199,15 @@ class AcFunDownloader(QMainWindow, BaseUI):
         self.download_thread.start()
 
     def get_directory(self):
-        global path
-        path = QFileDialog.getExistingDirectory(None, "选择保存文件夹", os.getcwd())
-        if len(path) > 20:
-            show_dir = path.split('/')[-1]
-            show_path = path[0:3] + '../' + show_dir
+        self.path = QFileDialog.getExistingDirectory(None, "选择保存文件夹", os.getcwd())
+        if len(self.path) is 0:
+            self.path = os.getcwd()
+        if len(self.path) > 20:
+            show_dir = self.path.split('/')[-1]
+            show_path = self.path[0:3] + '../' + show_dir
         else:
-            show_path = path
-        self.fold_btn.setText(QCoreApplication.translate('GUI_MWin', show_path))
+            show_path = self.path
+        self.fold_btn.setText(show_path)
 
     def get_info_callback(self, callback_list):
         self.title = callback_list[0]
@@ -266,6 +271,22 @@ class AcFunDownloader(QMainWindow, BaseUI):
         self.download_thread.start()
         self.pause_btn.clicked.connect(self.pause_task)
         self.cancel_btn.clicked.connect(self.cancel_task)
+
+    def mousePressEvent(self, event):
+        if event.button() is Qt.Qt.LeftButton:
+            self.flag = True
+            self.position = event.globalPos() - self.pos()
+            event.accept()
+            self.setCursor(Qt.QCursor(Qt.Qt.OpenHandCursor))
+
+    def mouseMoveEvent(self, event):
+        if event.button() is Qt.Qt.LeftButton and self.flag:
+            self.move(event.globalPos() - self.position)
+            event.accept()
+
+    def mouseReleaseEvent(self, event):
+        self.flag = False
+        self.setCursor(Qt.QCursor(Qt.Qt.ArrowCursor))
 
 
 if __name__ == '__main__':
