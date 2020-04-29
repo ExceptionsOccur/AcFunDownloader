@@ -1,7 +1,7 @@
 # AcFunDownloader
 AcFun - 认真你就输啦 (・ω・)ノ- ( ゜- ゜)つロ
 
-<iframe height=500 width=500 src="demo.gif">demo</iframe>  
+<iframe height=500 width=500 src="https://github.com/ExceptionsOccur/AcFunDownloader/blob/master/demo.gif">demo</iframe>  
 
 
 ## TO DO：
