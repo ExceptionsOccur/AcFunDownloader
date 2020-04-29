@@ -1,0 +1,63 @@
+.QPushButton#search_btn, #download_btn, #fold_btn, #pause_btn, #cancel_btn{
+    border-style:none;
+    border:1px solid #C0DCF2;
+    color:#00466B;
+    padding:5px;
+    min-height:20px;
+    border-radius:5px;
+    background: qlineargradient(spread:pad,x1:0,y1:0,x2:0,y2:1,stop:0 #DEF0FE,stop:1 #C0DEF6);
+    background: transparent;
+}
+
+.QPushButton#mini_btn{
+        background:#6DDF6D;
+        border-radius:5px;
+}
+
+.QPushButton#mini_btn:hover{
+    background:green;
+}
+
+.QPushButton#close_btn{
+    background:#EE4000;
+    border-radius:5px;
+}
+
+.QPushButton#close_btn:hover{
+    background:red;
+}
+
+.QWidget#central_widget{
+
+    border-radius:5px;
+}
+
+QLineEdit,QMessageBox::pane{
+    color:#00466B;
+    border-radius:5px;
+    background: transparent;
+}
+.QProgressBar{
+    border:1px solid #FFFFFF;
+    height:20;
+    text-align: center;
+    color:black;
+    border-radius:5px;
+    background: transparent;
+}
+
+.QTableWidget#table_widget{
+    border:1px solid #FFFFFF;
+    height:30;
+    color: black;
+    border-radius:5px;
+    background: transparent;
+}
+
+QTableWidget::pane{
+    border:none;
+}
+
+.QTabWidget#QStackedWidget{
+    background: transparent;
+}
