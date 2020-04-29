@@ -218,6 +218,8 @@ class AcFunDownloader(QMainWindow, BaseUI):
     def get_directory(self):
         global path
         path = QFileDialog.getExistingDirectory(None, "选择保存文件夹", os.getcwd())
+        if len(path) is 0:
+            path = os.getcwd()
         if len(path) > 20:
             show_dir = path.split('/')[-1]
             show_path = path[0:3] + '../' + show_dir
@@ -255,6 +257,9 @@ class AcFunDownloader(QMainWindow, BaseUI):
         global duration
         if ts_pref_url is '':
             input_data = self.input_box.text()
+            if len(input_data) is 0:
+                QMessageBox.information(self, '好像哪里不对！', '输入为空')
+                return
             ac_num = ''
             temp = re.findall(r'(ac\d+)', input_data)
             if len(temp) is 0:
