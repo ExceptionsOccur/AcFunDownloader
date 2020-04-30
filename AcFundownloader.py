@@ -6,7 +6,7 @@ import time
 import sys
 import requests
 import cv2
-from PyQt5.QtCore import QThread, pyqtSignal, QCoreApplication
+from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from BaseLayout import BaseUI
@@ -197,17 +197,17 @@ class AcFunDownloader(QMainWindow, BaseUI):
 
     def pause_task(self):
         self.download_thread.data[1] = PAUSE
-        self.download_btn.setText(QCoreApplication.translate('GUI_MWin', '开始'))
+        self.download_btn.setText('开始')
 
     def cancel_task(self):
         if self.download_thread.isRunning():
             self.download_thread.data[1] = CANCEL
             self.download_bar.setValue(0)
-            self.download_btn.setText(QCoreApplication.translate('GUI_MWin', '下载'))
+            self.download_btn.setText('下载')
         else:
             os.remove(path + '/' + self.title + '.mp4')
             self.download_bar.setValue(0)
-            self.download_btn.setText(QCoreApplication.translate('GUI_MWin', '下载'))
+            self.download_btn.setText('下载')
         self.pause_btn.disconnect()
         self.cancel_btn.disconnect()
 
@@ -225,7 +225,7 @@ class AcFunDownloader(QMainWindow, BaseUI):
             show_path = path[0:3] + '../' + show_dir
         else:
             show_path = path
-        self.fold_btn.setText(QCoreApplication.translate('GUI_MWin', show_path))
+        self.fold_btn.setText(show_path)
 
     def get_info_callback(self, callback_list):
         global duration

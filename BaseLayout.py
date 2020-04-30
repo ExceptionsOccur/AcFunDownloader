@@ -8,8 +8,6 @@ from PyQt5.QtGui import QPalette, QBrush, QPixmap
 class BaseUI(object):
     def setUI(self, MWin):
 
-        _translate = QtCore.QCoreApplication.translate
-
         MWin.setObjectName('GUI_MWin')
         MWin.setFixedSize(420, 260)
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
@@ -25,7 +23,7 @@ class BaseUI(object):
         font.setFamily('微软雅黑')
         font.setPointSize(10)
         MWin.setFont(font)
-        MWin.setWindowTitle(_translate('MWin', 'AcFunDownloader'))
+        MWin.setWindowTitle('AcFunDownloader')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap('icon.ico'), QtGui.QIcon.Normal)     # TO DO：图标换个识别度好的
         MWin.setWindowIcon(icon)
@@ -40,7 +38,7 @@ class BaseUI(object):
         font.setFamily('微软雅黑')
         font.setPointSize(8)
         self.text_box.setFont(font)
-        # self.text_box.setText(_translate('MWin', 'AcFun - 认真你就输啦 (・ω・)ノ- ( ゜- ゜)つロ'))
+        # self.text_box.setText('AcFun - 认真你就输啦 (・ω・)ノ- ( ゜- ゜)つロ')
         self.text_box.setText('AcFun - 认真你就输啦 (・ω・)ノ- ( ゜- ゜)つロ')
         self.text_box.setAlignment(QtCore.Qt.AlignCenter)
 
@@ -59,12 +57,12 @@ class BaseUI(object):
         self.close_btn = QtWidgets.QPushButton(self.central_widget)
         self.close_btn.setObjectName('close_btn')
         self.close_btn.setFixedSize(18, 18)
-        self.close_btn.setText(_translate('GUI_MWin', 'x'))
+        self.close_btn.setText('x')
 
         self.mini_btn = QtWidgets.QPushButton(self.central_widget)
         self.mini_btn.setObjectName('mini_btn')
         self.mini_btn.setFixedSize(18, 18)
-        self.mini_btn.setText(_translate('GUI_MWin', '-'))
+        self.mini_btn.setText('-')
 
         self.console_layout.addWidget(self.close_btn)
         self.console_layout.addWidget(self.mini_btn)
@@ -81,7 +79,7 @@ class BaseUI(object):
         font.setFamily('微软雅黑')
         font.setPointSize(10)
         self.input_box.setFont(font)
-        self.input_box.setPlaceholderText(_translate('GUI_MWin', '输入ac号或视频链接'))
+        self.input_box.setPlaceholderText('输入ac号或视频链接')
         self.input_box.setObjectName('input_box')
         self.up_layout.addWidget(self.input_box)
 
@@ -92,7 +90,7 @@ class BaseUI(object):
         self.search_btn.setFont(font)
         self.search_btn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.search_btn.setObjectName('search_btn')
-        self.search_btn.setText(_translate('GUI_MWin', '搜索'))
+        self.search_btn.setText('搜索')
         self.up_layout.addWidget(self.search_btn)
 
         self.download_btn = QtWidgets.QPushButton(self.central_widget)
@@ -102,7 +100,7 @@ class BaseUI(object):
         self.download_btn.setFont(font)
         self.download_btn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.download_btn.setObjectName('download_btn')
-        self.download_btn.setText(_translate('GUI_MWin', '下载'))
+        self.download_btn.setText('下载')
         self.up_layout.addWidget(self.download_btn)
         # self.up_layout.setStretchFactor(self.input_box, 8)
         # self.up_layout.setStretchFactor(self.search_btn, 8)
@@ -130,7 +128,7 @@ class BaseUI(object):
         self.fold_btn.setFont(font)
         self.fold_btn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.fold_btn.setObjectName('fold_btn')
-        self.fold_btn.setText(_translate('GUI_MWin', os.getcwd()))
+        self.fold_btn.setText(os.getcwd())
         self.tips_layout.addWidget(self.fold_btn)
 
         self.pause_btn = QtWidgets.QPushButton(self.central_widget)
@@ -140,7 +138,7 @@ class BaseUI(object):
         self.pause_btn.setFont(font)
         self.pause_btn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.pause_btn.setObjectName('fold_btn')
-        self.pause_btn.setText(_translate('GUI_MWin', '暂停'))
+        self.pause_btn.setText('暂停')
         self.tips_layout.addWidget(self.pause_btn)
 
         self.cancel_btn = QtWidgets.QPushButton(self.central_widget)
@@ -150,7 +148,7 @@ class BaseUI(object):
         self.cancel_btn.setFont(font)
         self.cancel_btn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.cancel_btn.setObjectName('fold_btn')
-        self.cancel_btn.setText(_translate('GUI_MWin', '取消'))
+        self.cancel_btn.setText('取消')
         self.tips_layout.addWidget(self.cancel_btn)
 
 
