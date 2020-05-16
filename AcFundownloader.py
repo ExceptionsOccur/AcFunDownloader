@@ -25,7 +25,7 @@ global duration
 ts_url_section = r',\n(.*?)\n#'
 ts_pref_url_section = r'https(.*?)segment/'
 illegal_name = r'[\/\\\:\*\?\"\<\>\|\s\n]'
-m3u8_section = r'window.videoInfo = (.*?);\n        window.qualityConfig ='
+m3u8_section = r'window.videoInfo = (.*?);'
 headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) \
                             Chrome/80.0.3987.132 Safari/537.36 Edg/80.0.361.66'}
 
