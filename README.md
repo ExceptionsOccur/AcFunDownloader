@@ -1,7 +1,7 @@
 ## AcFunDownloader
 AcFun - 认真你就输啦 (・ω・)ノ- ( ゜- ゜)つロ
   
-![demo](https://github.com/ExceptionsOccur/AcFunDownloader/blob/master/demo.gif)
+![demo](./demo.gif)
 ### TO DO：
 ~~1、添加异常判断，包括：网络错误异常、网络返回数据异常、下载文件校验(通过视频时长对比)、输入链接判断~~   
 ~~2、重复下载判断~~   
@@ -14,7 +14,7 @@ AcFun - 认真你就输啦 (・ω・)ノ- ( ゜- ゜)つロ
 ~~9、增加视频时长、上传时间信息~~  
 ~~10、QSS样式表~~  
 11、鼠标拖动窗口  
-12、添加任务状态判断
+~~12、添加任务状态判断~~
     
 PS：我只是想囤几个视频，能用就行，修bug只是次要的  
 ***

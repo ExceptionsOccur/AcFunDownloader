@@ -18,6 +18,7 @@ last_ac = ''
 PAUSE = 0
 CANCEL = -1
 START = 1
+download_flag = False
 global title
 global up
 global create_time
@@ -118,14 +119,13 @@ class DownloadThread(QThread):
         global path
         global duration
         global START
+        global download_flag
         input_title = re.sub(illegal_name, '-', self.data[0])
         start_point = self.data[2]
         total_num = len(ts_url)
         file_name = input_title + '.mp4'
-        if os.path.exists(path + '/' + file_name) is True:
-            self.file_exits.emit('该文件已存在')
-            return
         with open(path + '/' + file_name, 'ab') as f:
+            download_flag = True
             for i in range(start_point, total_num):
                 ts = requests.get(ts_pref_url + ts_url[i])
                 f.write(ts.content)
@@ -140,12 +140,14 @@ class DownloadThread(QThread):
                         return
                 if self.data[1] is CANCEL:
                     f.close()
+                    download_flag = False
                     os.remove(path + '/' + file_name)
                     self.signal.emit(0)
                     return
             f.close()
             START = 0
         self.signal.emit(100)
+        download_flag = False
         local_file_duration = get_mp4_duration(path + '/' + file_name)
         if duration != local_file_duration:
             self.file_error.emit('文件错误，下载文件时长不符！')
@@ -196,24 +198,37 @@ class AcFunDownloader(QMainWindow, BaseUI):
         QMessageBox.information(self, '好像哪里不对！', s)
 
     def pause_task(self):
-        self.download_thread.data[1] = PAUSE
-        self.download_btn.setText('开始')
+        if self.download_thread.data[1] is PAUSE:
+            self.pause_btn.setText('暂停')
+            self.download_thread.data = [self.title, START, self.pause_point]
+            self.download_thread.start()
+        elif self.download_thread.data[1] is START:
+            self.pause_btn.setText('开始')
+            self.download_thread.data[1] = PAUSE
+
 
     def cancel_task(self):
+        global download_flag
+        if download_flag is not True:
+            self.pop_information('当前没有下载任务')
+            return
         if self.download_thread.isRunning():
             self.download_thread.data[1] = CANCEL
             self.download_bar.setValue(0)
-            self.download_btn.setText('下载')
+            # self.download_btn.setText('下载')
         else:
             os.remove(path + '/' + self.title + '.mp4')
             self.download_bar.setValue(0)
-            self.download_btn.setText('下载')
+            # self.download_btn.setText('暂停')
+        download_flag = False
+        self.pause_btn.setText('暂停')
+        self.pause_point = 0
         self.pause_btn.disconnect()
         self.cancel_btn.disconnect()
 
-    def continue_task(self):
-        self.download_thread.data = [self.title, False, self.pause_point]
-        self.download_thread.start()
+    # def continue_task(self):
+    #     self.download_thread.data = [self.title, False, self.pause_point]
+    #     self.download_thread.start()
 
     def get_directory(self):
         global path
@@ -255,6 +270,10 @@ class AcFunDownloader(QMainWindow, BaseUI):
         global ts_pref_url
         global ts_url
         global duration
+        global download_flag
+        if download_flag is True:
+            self.pop_information('当前正在下载')
+            return
         if ts_pref_url is '':
             input_data = self.input_box.text()
             if len(input_data) is 0:
@@ -290,6 +309,11 @@ class AcFunDownloader(QMainWindow, BaseUI):
             ts_url = re.findall(ts_url_section, res)
             ts_pref_url = re.search(ts_pref_url_section, m3u8_file_url)[0]
             self.update_ui(self.title, self.up, self.create_time, duration)
+        input_title = re.sub(illegal_name, '-', self.title)
+        file_name = input_title + '.mp4'
+        if os.path.exists(path + '/' + file_name) is True:
+            self.pop_information('该文件已存在')
+            return
         self.download_thread.data = [self.title, START, self.pause_point]
         self.download_thread.start()
         self.pause_btn.clicked.connect(self.pause_task)
