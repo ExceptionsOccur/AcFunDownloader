@@ -23,7 +23,7 @@ global up
 global create_time
 global duration
 ts_url_section = r',\n(.*?)\n#'
-ts_pref_url_section = r'https(.*?)segment/'
+ts_pref_url_section = r'https(.*?)hls/'
 illegal_name = r'[\/\\\:\*\?\"\<\>\|\s\n]'
 m3u8_section = r'(?<=window.videoInfo = )(.*?)(?=;)'
 headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) \
