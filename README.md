@@ -1,7 +1,7 @@
 ## AcFunDownloader
 AcFun - 认真你就输啦 (・ω・)ノ- ( ゜- ゜)つロ
   
-![demo](./demo.gif)
+![demo](https://github.com/ExceptionsOccur/AcFunDownloader/blob/master/demo.gif)
 ### TO DO：
 ~~1、添加异常判断，包括：网络错误异常、网络返回数据异常、下载文件校验(通过视频时长对比)、输入链接判断~~   
 ~~2、重复下载判断~~   
