@@ -6,7 +6,8 @@ import time
 import sys
 import requests
 import cv2
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal, Qt
+from PyQt5.QtGui import QMouseEvent
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from BaseLayout import BaseUI
@@ -173,6 +174,8 @@ class AcFunDownloader(QMainWindow, BaseUI):
         self.up = ''
         self.create_time = ''
         self.pause_point = 0
+        self.win_pos = self.pos()
+        self.button_flag = False
         self.get_info_thread = GetInfoThread()
         self.download_thread = DownloadThread()
         path = os.getcwd()
@@ -190,6 +193,23 @@ class AcFunDownloader(QMainWindow, BaseUI):
         self.get_info_thread.ac_num_is_illegal.connect(self.pop_information)
         self.get_info_thread.same_result.connect(self.pop_information)
         self.download_thread.file_error.connect(self.pop_information)
+        self.setMouseTracking(True)
+
+    def mousePressEvent(self, event: QMouseEvent):
+        if event.buttons() == Qt.LeftButton:    # 使用 is 不生效
+            self.button_flag = True
+            self.win_pos = event.globalPos() - self.pos()
+            event.accept()
+
+    def mouseMoveEvent(self, event: QMouseEvent):
+        if Qt.LeftButton and self.button_flag:
+            self.move(event.globalPos() - self.win_pos)
+            event.accept()
+            self.setCursor(Qt.OpenHandCursor)
+
+    def mouseReleaseEvent(self, event: QMouseEvent):
+        self.button_flag = False
+        self.setCursor(Qt.ArrowCursor)
 
     def store_pause_point(self, i):
         self.pause_point = i
