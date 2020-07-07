@@ -10,7 +10,8 @@ class BaseUI(object):
 
         MWin.setObjectName('GUI_MWin')
         MWin.setFixedSize(420, 260)
-        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+        #self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+        MWin.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         MWin.setWindowOpacity(0.9)
         # MWin.setAttribute(QtCore.Qt.WA_TintedBackground)
         # MWin.resize(400, 120)
