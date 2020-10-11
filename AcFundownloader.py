@@ -98,7 +98,7 @@ class GetInfoThread(QThread):
             duration = '{:0>2d}:{:0>2d}'.format(int(m), int(s))
             ksPlay_info = data_json['currentVideoInfo']['ksPlayJson']
             ksPlay_json = json.loads(ksPlay_info)
-            m3u8_file_url = ksPlay_json['adaptationSet']['representation'][0]['url']
+            m3u8_file_url = ksPlay_json['adaptationSet'][0]['representation'][0]['url']
             res = requests.get(m3u8_file_url).text
             ts_url = re.findall(ts_url_section, res)
             ts_pref_url = re.search(ts_pref_url_section, m3u8_file_url)[0]
