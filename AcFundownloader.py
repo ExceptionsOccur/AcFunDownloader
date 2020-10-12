@@ -27,7 +27,7 @@ global duration
 ts_url_section = r',\n(.*?)\n#'
 ts_pref_url_section = r'https(.*?)hls/'
 illegal_name = r'[\/\\\:\*\?\"\<\>\|\s\n]'
-m3u8_section = r'(?<=window.videoInfo = )(.*?)(?=;)'
+m3u8_section = r'(?<=window.videoInfo = )(.*?)(?=;(\s.*)window.videoResource)'
 headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) \
                             Chrome/80.0.3987.132 Safari/537.36 Edg/80.0.361.66'}
 
@@ -89,7 +89,7 @@ class GetInfoThread(QThread):
             if len(temp) is 0:
                 self.no_this_ac.emit('世界线可能发生了变动，无法找到该视频')
                 return
-            data = temp[0]
+            data = temp[0][0]
             data_json = json.loads(data)
             title = data_json['title']
             up = data_json['user']['name']
@@ -324,7 +324,7 @@ class AcFunDownloader(QMainWindow, BaseUI):
             duration = '{:0>2d}:{:0>2d}'.format(int(m), int(s))
             ks_play_info = data_json['currentVideoInfo']['ksPlayJson']
             ks_play_json = json.loads(ks_play_info)
-            m3u8_file_url = ks_play_json['adaptationSet']['representation'][0]['url']
+            m3u8_file_url = ks_play_json['adaptationSet'][0]['representation'][0]['url']
             res = requests.get(m3u8_file_url).text
             ts_url = re.findall(ts_url_section, res)
             ts_pref_url = re.search(ts_pref_url_section, m3u8_file_url)[0]
